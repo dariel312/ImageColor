@@ -111,6 +111,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="bmplib.c" />
+    <ClCompile Include="ImageColor.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="bmplib.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
