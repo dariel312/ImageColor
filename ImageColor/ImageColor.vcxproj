@@ -113,11 +113,19 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="bmplib.c" />
+    <ClCompile Include="ColorConverter.cpp" />
     <ClCompile Include="ImageColor.c" />
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bmplib.h" />
+    <ClInclude Include="ColorConverter.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="example.bmp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+    </Image>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

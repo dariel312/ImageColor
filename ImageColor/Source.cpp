@@ -1,26 +1,23 @@
 #include <stdio.h>
 #include <iostream>
+#include "ColorConverter.h"
+
 using namespace std;
-struct Pixel
-{
-	unsigned char R;
-	unsigned char G;
-	unsigned char B;
-};
+
 class Image
 {
 public:
 	int Width;
 	int Height;
-	Pixel** Data;
+	HsvColor** Data;
 
 	Image(int Width, int Height)
 	{
 		this->Width = Width;
 		this->Height = Height;
-		this->Data = new Pixel*[Width];
+		this->Data = new HsvColor*[Width];
 		for (int z = 0; z < Width; z++)
-			this->Data[z] = new Pixel[Height];
+			this->Data[z] = new HsvColor[Height];
 	}
 };
 Image* ReadBMP(char* filename)
@@ -38,7 +35,7 @@ Image* ReadBMP(char* filename)
 
 	//declare return data
 	Image* img = new Image(width, height);
-	Pixel** body = img->Data;
+	HsvColor** body = img->Data;
 
 	int row_padded = (width * 3 + 3) & (~3);
 	unsigned char* data = new unsigned char[row_padded];
@@ -50,9 +47,11 @@ Image* ReadBMP(char* filename)
 		for (int j = 0; j < width * 3; j += 3)
 		{
 			int y = j / 3;
-			body[i][y].B = data[j];
-			body[i][y].G = data[j + 1];
-			body[i][y].R = data[j + 2];
+			RgbColor color;
+			color.B = data[j];
+			color.G = data[j + 1];
+			color.R = data[j + 2];
+			body[i][y] = rgb2hsv(color);
 		}
 	}
 
@@ -61,24 +60,19 @@ Image* ReadBMP(char* filename)
 	return img;
 }
 
+//Pixel AnalyzeColor(Pixel** img) {
+//	return NULL;
+//}
+
 int main() {
 	Image* img;
 	//img = ReadBMP("C:/Users/darie/Source/Repos/ImageColor/Debug/example.bmp");
 	img = ReadBMP("example.bmp");
 	int height = img->Height;
 	int width = img->Width;
-	Pixel** data = img->Data;
-
-	for (int i = 0; i < height; i++)
-	{
-		for (int j = 0; j < width; j++)
-		{
-			cout << i*height + j << " " << "R: " << (int)data[i][j].R << " G: " << (int)data[i][j].G << " B: " << (int)data[i][j].B << endl;
-		}
-	}
-
-	cout << "Height: " << height << endl;
-	cout << " Width: " << width << endl;
-
+	HsvColor** data = img->Data;
+	cout << "H " << (int)data[0][0].H << endl;
+	cout << "S " << (int)data[0][0].S << endl;
+	cout << "V " << (int)data[0][0].V << endl;
 	return 0;
 }
