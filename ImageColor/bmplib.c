@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <fcntl.h>
 #include <string.h>
 #include <errno.h>
@@ -32,22 +31,24 @@ int readFile (char *filename, int *rows, int *cols, PIXEL** bitmap)
 {
   int fd, ret;
   unsigned int start;
-  
+  FILE* file;
   if(filename) {
-    if((fd = open(filename, O_RDONLY)) < 0) {
+    if((file = fopen(filename, "r")) == NULL) {
       perror("Can't open bmp file to read");
       return -1;
     }
-  } else fd = STDIN_FILENO;
+  } else fd = stdout;
 
   ret = readHeader (fd, rows, cols, &start);
   if(ret) return ret;
 
   *bitmap = (PIXEL*)malloc(sizeof(PIXEL)*(*rows)*(*cols));
   ret = readBits (fd, *bitmap, *rows, *cols, start);
-  if(ret) return ret;
+  if(ret) 
+	  return ret;
 
-  if(filename) close(fd);
+  if(filename) 
+	  close(fd);
 
   return 0;
 }
@@ -62,7 +63,7 @@ int writeFile (char* filename, int rows, int cols, PIXEL* bitmap)
       perror("Can't open bmp file to write");
       return -1;
     }
-  } else fd = STDOUT_FILENO;
+  } else fd = stdout;
 
   ret = writeHeader (fd, rows, cols, start);
   if(ret) return ret;

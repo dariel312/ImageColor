@@ -116,12 +116,12 @@ namespace LEDController
                 }
             }
 
-            int a = 0;
+            int max = 0;
             for (int i = 0; i < colors.Length; i++)
-                if (colors[i] > colors[a])
-                    a = i;
+                if (colors[i] > colors[max])
+                    max = i;
 
-            currentColor = ColorTranslator.FromWin32(ColorHLSToRGB(240 * (a * 15) / 360, 132, 240));
+            currentColor = ColorTranslator.FromWin32(ColorHLSToRGB(240 * (max* 15) / 360, 132, 240));
 
 
         }
