@@ -100,10 +100,10 @@ namespace LEDController
             {
                 for (int y = 0; y < scaled.Size.Height; y++)
                 {
-                    float color = scaled.GetPixel(x, y).GetHue();
-                    float quotient = color / 24;
-                    int range = (int)Math.Round(quotient);
-
+                    float bucketNumber = 360 / colorDepth;
+                    float hue = scaled.GetPixel(x, y).GetHue();
+                    int range = (int)Math.Round(hue / bucketNumber);
+                    
                     float saturation = scaled.GetPixel(x, y).GetSaturation();
                     float brightness = scaled.GetPixel(x, y).GetBrightness();
 
@@ -119,7 +119,7 @@ namespace LEDController
             int max = 0;
             for (int i = 0; i < colors.Length; i++)
                 if (colors[i] > colors[max])
-                    max = i;
+                  
 
             currentColor = ColorTranslator.FromWin32(ColorHLSToRGB(240 * (max* 15) / 360, 132, 240));
 

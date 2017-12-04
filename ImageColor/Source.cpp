@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <iostream>
+#include <cmath>
 #include "ColorConverter.h"
 
+#define COLOR_DEPTH 24
 using namespace std;
 
 class Image
@@ -60,19 +62,52 @@ Image* ReadBMP(char* filename)
 	return img;
 }
 
-//Pixel AnalyzeColor(Pixel** img) {
-//	return NULL;
-//}
+RgbColor AnalyzeColor(HsvColor** img, int startX, int endX, int countX, int countY) {
+	RgbColor currentColor;
+	int colorDepth = 24;
+
+	int colors[COLOR_DEPTH] = { 0 };
+
+	for (int x = 0; x < countX; x++)
+	{
+		for (int y = 0; y < countY; y++)
+		{
+			HsvColor *color = (img[x]+y);
+			float quotient = color->H / 24;
+			int range = (int)round(quotient);
+
+			float saturation = scaled.GetPixel(x, y).GetSaturation();
+			float brightness = scaled.GetPixel(x, y).GetBrightness();
+
+			if (range == colorDepth)
+				range = 0;
+
+			if (brightness >= 0.10f && brightness <= 0.80f && saturation >= 0.3f)
+				colors[range]++;
+
+		}
+	}
+
+	int max = 0;
+	for (int i = 0; i < colors.Length; i++)
+		if (colors[i] > colors[max])
+			max = i;
+
+	currentColor = ColorTranslator.FromWin32(ColorHLSToRGB(240 * (max * 15) / 360, 132, 240));
+	return currentColor;
+}
 
 int main() {
 	Image* img;
-	//img = ReadBMP("C:/Users/darie/Source/Repos/ImageColor/Debug/example.bmp");
-	img = ReadBMP("example.bmp");
+	img = ReadBMP("C:/Users/darie/Source/Repos/ImageColor/Debug/example.bmp");
+	//img = ReadBMP("example.bmp");
 	int height = img->Height;
 	int width = img->Width;
 	HsvColor** data = img->Data;
-	cout << "H " << (int)data[0][0].H << endl;
-	cout << "S " << (int)data[0][0].S << endl;
-	cout << "V " << (int)data[0][0].V << endl;
+
+
+
+	delete img->Data;
+	delete img;
 	return 0;
 }
