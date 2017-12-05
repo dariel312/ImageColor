@@ -62,7 +62,7 @@ namespace LEDController
 
             try
             {
-                ardPort.Open();
+               // ardPort.Open();
             }  //We open here because Form Exit event will be called
             catch
             {
@@ -79,7 +79,7 @@ namespace LEDController
                 if (ardPort.IsOpen)
                     sendColor();
 
-                System.Threading.Thread.Sleep(33);
+                System.Threading.Thread.Sleep(15);
             }
 
         }
@@ -93,35 +93,34 @@ namespace LEDController
             gfxScaled = Graphics.FromImage(scaled);
             gfxScaled.DrawImage(bmpScreenshot, new RectangleF(0, 0, scaled.Width, scaled.Height));
 
-            int colorDepth = 24;
+            int colorDepth = 256;
             int[] colors = new int[colorDepth];
+            float bucketNumber = 360 / colorDepth;
 
             for (int x = 0; x < scaled.Size.Width; x++)
             {
                 for (int y = 0; y < scaled.Size.Height; y++)
                 {
-                    float bucketNumber = 360 / colorDepth;
                     float hue = scaled.GetPixel(x, y).GetHue();
-                    int range = (int)Math.Round(hue / bucketNumber);
+                    int colorIndex = (int)Math.Round(hue / bucketNumber);
                     
                     float saturation = scaled.GetPixel(x, y).GetSaturation();
                     float brightness = scaled.GetPixel(x, y).GetBrightness();
 
-                    if (range == colorDepth)
-                        range = 0;
+                    colorIndex = colorIndex % colorDepth;
 
                     if (brightness >= 0.10f && brightness <= 0.80f && saturation >= 0.3f)
-                        colors[range]++;
+                        colors[colorIndex]++;
 
                 }
             }
 
-            int max = 0;
+            int colorMax = 0;
             for (int i = 0; i < colors.Length; i++)
-                if (colors[i] > colors[max])
-                  
+                if (colors[i] > colors[colorMax])
+                    colorMax = i;
 
-            currentColor = ColorTranslator.FromWin32(ColorHLSToRGB(240 * (max* 15) / 360, 132, 240));
+            currentColor = ColorTranslator.FromWin32(ColorHLSToRGB(255 * (colorMax* (int)bucketNumber) / 360, 132, 240));
 
 
         }
