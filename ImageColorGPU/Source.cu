@@ -1,27 +1,15 @@
 #include <stdio.h>
 #include <iostream>
 #include <cmath>
-#include "Colors.h"
+#include "Color.h"
+#include "cuda_runtime.h"
+#include "device_launch_parameters.h"
 
+#define GPU_BLOCKS 16
+#define GPU_THREADS 255
 #define COLOR_DEPTH 24
 using namespace std;
 
-class Image
-{
-public:
-	int Width;
-	int Height;
-	HsvColor** Data;
-
-	Image(int Width, int Height)
-	{
-		this->Width = Width;
-		this->Height = Height;
-		this->Data = new HsvColor*[Width];
-		for (int z = 0; z < Width; z++)
-			this->Data[z] = new HsvColor[Height];
-	}
-};
 Image* ReadBMP(char* filename)
 {
 	FILE* f = fopen(filename, "rb");
@@ -62,7 +50,7 @@ Image* ReadBMP(char* filename)
 	return img;
 }
 
-RgbColor AnalyzeImage(HsvColor** img, int startX, int endX, int countX, int countY) {
+RgbColor AnalyzeImage(HsvColor** img, int countX, int countY) {
 
 	int colors[COLOR_DEPTH] = { 0 };
 
@@ -93,19 +81,40 @@ RgbColor AnalyzeImage(HsvColor** img, int startX, int endX, int countX, int coun
 	return HsvToRgb(currentColor);
 }
 
-int main() {
-	//Read image from file
-	Image* img = ReadBMP("example.bmp");
+__global__ 
+void AnalyzeColorGPU(HsvColor** Img, int SizeX, int SizeY, int** Buckets) {
 
-	//Analyze image
-	RgbColor c = AnalyzeImage(img->Data, 0, 0, img->Width, img->Height);
+}
+
+void doCPU(Image* img)
+{
+	RgbColor c = AnalyzeImage(img->Data, img->Width, img->Height);
 	cout << "The most used color in this image is:" << endl;
 	cout << "R: " << c.R * 255 << endl;
 	cout << "G: " << c.G * 255 << endl;
 	cout << "B: " << c.B * 255 << endl;
+}
+void doGPU(Image* Img, int Blocks, int Threads) {
 
+	int **buckets = 0;
+	int **data= 0;
 
-	delete img->Data;
-	delete img;
+	//Allocate Img
+	cudaMalloc(&data, sizeof(HsvColor*) * Img->Width);
+	//for (int x = 0; x < Img->Width; x++)
+	//	cudaMalloc(&data[x], sizeof(HsvColor) * Img->Height);
+
+	AnalyzeColorGPU<<<Blocks, Threads>>>(Img->Data, img, buckets);
+}
+int main() {
+	Image* img = ReadBMP("example.bmp");
+
+	//Made as a variable so in the future we can pass thread count as a variable in command line
+	int numBlocks = GPU_BLOCKS;
+	int numThreads = GPU_THREADS; 
+
+	doCPU(img);
+	doGPU(img, numBlocks, numThreads);
+
 	return 0;
 }
