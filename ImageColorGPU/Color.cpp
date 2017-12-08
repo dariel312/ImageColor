@@ -1,4 +1,4 @@
-#include "Color.h"
+#include "ImageColor.h"
 
 HsvColor RgbToHsv(RgbColor in)
 {
@@ -102,4 +102,44 @@ RgbColor HsvToRgb(HsvColor in)
 		break;
 	}
 	return out;
+}
+
+
+Image* ReadBMP(char* filename)
+{
+	FILE* f = fopen(filename, "rb");
+
+	if (f == NULL)
+		throw "Argument Exception";
+
+	unsigned char info[54];
+	fread(info, sizeof(unsigned char), 54, f); // read the 54-byte header
+
+	int sizeX = *(int*)&info[18];
+	int sizeY = *(int*)&info[22];
+
+	//declare return data
+	Image* img = new Image(sizeX, sizeY);
+	HsvColor* body = img->Data;
+
+	int row_padded = (sizeX * 3 + 3) & (~3);
+	unsigned char* data = new unsigned char[row_padded];
+
+	for (int y = 0; y < sizeY; y++)
+	{
+		fread(data, sizeof(unsigned char), row_padded, f);
+		for (int j = 0; j < sizeX * 3; j += 3)
+		{
+			int x = j / 3;
+			RgbColor color;
+			color.B = data[j] / 255.0;
+			color.G = data[j + 1] / 255.0;
+			color.R = data[j + 2] / 255.0;
+			body[y*sizeX + x] = RgbToHsv(color);
+		}
+	}
+
+	fclose(f);
+	delete data;
+	return img;
 }

@@ -86,16 +86,22 @@ copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <CudaCompile Include="kernel.cu" />
-    <CudaCompile Include="Source.cu" />
+    <CudaCompile Include="ImageColor.cu" />
+    <CudaCompile Include="Main.cu">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </CudaCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Color.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Color.h" />
+    <ClInclude Include="ImageColor.h" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="example-01.bmp" />
+    <Image Include="Example-02.bmp" />
+    <Image Include="Example-03.bmp" />
+    <Image Include="Example-04.bmp" />
     <Image Include="example.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
