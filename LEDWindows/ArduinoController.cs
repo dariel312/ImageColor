@@ -51,9 +51,9 @@ namespace LEDController
             stopWorker = true;
             ardPort.Close();
         }
-        private void sendColor()
+        public void SendColor(Color c)
         {
-            ardPort.Write(new byte[] { 100, currentColor.R, currentColor.G, currentColor.B }, 0, 4);
+            ardPort.Write(new byte[] { 100, c.R, c.G, c.B }, 0, 4);
         }
         private void workerLoop()
         {
@@ -77,7 +77,7 @@ namespace LEDController
                 GetScreenColor();
 
                 if (ardPort.IsOpen)
-                    sendColor();
+                    SendColor(currentColor);
 
                 System.Threading.Thread.Sleep(15);
             }
@@ -89,7 +89,6 @@ namespace LEDController
 
             gfxScreenshot.CopyFromScreen(Screen.PrimaryScreen.Bounds.X, Screen.PrimaryScreen.Bounds.Y, 0, 0, Screen.PrimaryScreen.Bounds.Size,
                                              CopyPixelOperation.SourceCopy);
-
             gfxScaled = Graphics.FromImage(scaled);
             gfxScaled.DrawImage(bmpScreenshot, new RectangleF(0, 0, scaled.Width, scaled.Height));
 
