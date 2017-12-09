@@ -44,7 +44,7 @@ namespace LEDController
             Bitmap img = new Bitmap(400, 400, PixelFormat.Format32bppArgb);
             Graphics g = Graphics.FromImage(img);
             g.DrawLine(new Pen(this.currectColor, 300), new Point(0, 0), new Point(300, 300));
-            pictureBox1.Image = img;
+            pictureBox1.Image = scaled;
 
         }
         void update()
