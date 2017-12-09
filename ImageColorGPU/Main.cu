@@ -1,8 +1,8 @@
 #include "ImageColor.h"
 
 using namespace std;
-#define BLOCK_DIVISIONS 1
-#define THREAD_DIVISIONS 1
+#define BLOCK_DIVISIONS 8
+#define THREAD_DIVISIONS 8
 
 Image* img = NULL;
 int* bucket = NULL;
