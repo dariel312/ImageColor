@@ -1,70 +1,109 @@
 #include "ImageColor.h"
 
 using namespace std;
+#define BLOCK_DIVISIONS 1
+#define THREAD_DIVISIONS 1
 
+Image* img = NULL;
+int* bucket = NULL;
+unsigned long long bucketSize = sizeof(int) * BLOCK_DIVISIONS*BLOCK_DIVISIONS * THREAD_DIVISIONS*THREAD_DIVISIONS * COLOR_DEPTH;
+unsigned long long dataSize = 0;
 
-void doCPU(Image* img)
+void doCPU()
 {
 	RgbColor c = AnalyzeColor(img->Data, img->Width, img->Height);
 	printf("The most used color in this image is:\n");
 	printf("R: %3.1f\nG: %3.1f\nB: %3.1f\n", c.R * 255, c.G * 255, c.B * 255);
 }
 
-void doGPU(Image* Img)
+//Allocates memory for GPU
+//Returns data pointer to GPU
+//Returns bucket pointer to GPU
+void allocateGPUMem(HsvColor** Data, int** Bucket)
 {
-	HsvColor *data = NULL;
-	unsigned long long size = sizeof(HsvColor) * Img->Width * Img->Height;
+	//Img
+	unsigned long long size = sizeof(HsvColor) * img->Width * img->Height;
+	cudaMalloc<HsvColor>(Data, size);
+	cudaMemcpy(*Data, img->Data, size, cudaMemcpyHostToDevice);
 
-	//allocate mem
-	cudaMalloc<HsvColor>(&data, size);
-	cudaMemcpy(data, Img->Data, size, cudaMemcpyHostToDevice);
+	cudaMallocManaged<int>(Bucket, bucketSize);
+}
 
-	//define block size
-	int blocksX = RoundToMultiple(Img->Width / 32.0, 2);
-	int blocksY = RoundToMultiple(Img->Height / 16.0, 2);
-	dim3 threads = dim3(32, 16);
-	dim3 gridDim = dim3(blocksX, blocksY);
-	
-	//execute gpu alg
-	AnalyzeColorGPU <<<gridDim, threads>>> (data, Img->Width, Img->Height);
-	cudaError_t success = cudaDeviceSynchronize();
+//Copies data back from gpu to cpu
+void copyBackToCPU(HsvColor** Data, int** Bucket)
+{
+	cudaMemcpy(img->Data, Data, dataSize, cudaMemcpyDeviceToHost);
 
-	//ReductionMaxImage<<<blocksY, 512>>> (data, Img->Width, Img->Height);
 
-	//Print
-	cudaMemcpy(Img->Data, data, size, cudaMemcpyDeviceToHost);
-
-	//Sum block indx
-	int bucket[COLOR_DEPTH] = { 0 };
-	for (int i = 0; i < blocksX * blocksY; i++)
+}
+void printBucket()
+{
+	long int total = 0;
+	//BLOCK_DIVISIONS*BLOCK_DIVISIONS * THREAD_DIVISIONS*THREAD_DIVISIONS * COLOR_DEPTH
+	for (int y = 0; y < THREAD_DIVISIONS*BLOCK_DIVISIONS; y++)
 	{
-		int inx = (int)Img->Data[i].H;
-		if(inx >= 0)
-			bucket[inx]++;
-		else {
-			int sd = 1;
+		for (int x = 0; x <  THREAD_DIVISIONS*BLOCK_DIVISIONS; x++)
+		{
+			for (int c = 0; c < COLOR_DEPTH; c++)
+			{
+				int bucketInx = c + (x * COLOR_DEPTH) + (y * THREAD_DIVISIONS*BLOCK_DIVISIONS * COLOR_DEPTH);
+				total += bucket[bucketInx];
+				printf(" %d", bucket[bucketInx]);
+			}
+			printf("\n");
 		}
 	}
+	printf("TOTAL: %d", total);
+}
 
-	int max = 0;
-	for (int i = 0; i < COLOR_DEPTH; i++)
-	{
-		float val = bucket[i];
-		if (val > bucket[max])
-			max = i;
-	}
+//Performs ImageColor analysis using GPU
+void doGPU()
+{
+	HsvColor *data = NULL;
+	dataSize = sizeof(HsvColor) * img->Width * img->Height;
+	allocateGPUMem(&data, &bucket);
 
-	float curr = max * 360 / COLOR_DEPTH;
+	dim3 threads = dim3(THREAD_DIVISIONS, THREAD_DIVISIONS);
+	dim3 gridDim = dim3(BLOCK_DIVISIONS, BLOCK_DIVISIONS);
+
+	//execute gpu alg
+	AnalyzeColorGPU <<<gridDim, threads>>> (data, img->Width, img->Height, bucket);
+	cudaError_t success = cudaDeviceSynchronize();
+
+	copyBackToCPU(&data, &bucket);
+	printBucket();
+	//Sum block indx
 	cudaFree(data);
+	cudaFree(bucket);
 }
 
 int main()
 {
-	Image* img = ReadBMP("example-01.bmp");
+	img = ReadBMP("example-01.bmp");
 
-	doCPU(img);
-	doGPU(img);
+	doCPU();
+	doGPU();
 
 	system("pause");
 	return 0;
 }
+/*int bucket[COLOR_DEPTH] = { 0 };
+for (int i = 0; i < BLOCK_DIVISIONS * BLOCK_DIVISIONS; i++)
+{
+	int inx = (int)Img->Data[i].H;
+	if(inx >= 0)
+		bucket[inx]++;
+	else {
+		int sd = 1;
+	}
+}
+
+int max = 0;
+for (int i = 0; i < COLOR_DEPTH; i++)
+{
+	float val = bucket[i];
+	if (val > bucket[max])
+		max = i;
+}
+
+float curr = max * 360 / COLOR_DEPTH;*/

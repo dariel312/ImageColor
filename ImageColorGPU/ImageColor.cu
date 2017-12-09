@@ -47,24 +47,40 @@ RgbColor AnalyzeColor(HsvColor* Img, int Width, int Height) {
 }
 
 __global__
-void AnalyzeColorGPU(HsvColor* data, int Width, int Height)
+void AnalyzeColorGPU(HsvColor* data, int Width, int Height, int* bucket)
 {
-	int x = blockIdx.x * blockDim.x + threadIdx.x;
-	int y = blockIdx.y * blockDim.y + threadIdx.y;
-	int colorIndex = 0;
-	HsvColor *color = (data + y*Width + x);
+	int xId = blockIdx.x * blockDim.x + threadIdx.x;
+	int yId = blockIdx.y * blockDim.y + threadIdx.y;
+	int blockStartX = Width / gridDim.x * blockIdx.x;
+	int blockStartY = Height / gridDim.y * blockIdx.y;
+	int threadStartX = threadIdx.x * Width / gridDim.x / blockDim.x + blockStartX;
+	int threadStartY = threadIdx.y * Height / gridDim.y / blockDim.y + blockStartY;
+	int xLength = Width / gridDim.x / blockDim.x;
+	int yLength = Height / gridDim.y / blockDim.y;
 
-	if (x < Width && y < Height)
+
+	HsvColor *color = NULL;
+	printf("X, Y: (%d, %d)\n", threadStartX, threadStartY);
+
+	for (int y = 0; y < yLength; y++)
 	{
-		colorIndex = (int)round(color->H * COLOR_DEPTH / MAX_DEGREES);
+		color = (data + y*yLength + threadStartX);
+		for (int x = 0; x < xLength; x++)
+		{
+			int colorIndex = (int)round(color->H * COLOR_DEPTH / MAX_DEGREES);
 
-		if (colorIndex == COLOR_DEPTH)
-			colorIndex = 0;
+			if (colorIndex == COLOR_DEPTH)
+				colorIndex = 0;
 
-		if (color->V >= MIN_BRIGHTNESS && color->V <= MAX_BRIGHTNESS && color->S >= MIN_SATURATION)
-			color->H = (float)colorIndex;
-		else
-			color->H = BAD_PIXEL;
+			if (color->V >= MIN_BRIGHTNESS && color->V <= MAX_BRIGHTNESS && color->S >= MIN_SATURATION)
+			{
+				int bucketInx = colorIndex + (x * COLOR_DEPTH) + (yId * blockDim.x  * gridDim.x * COLOR_DEPTH);
+				bucket[bucketInx]++;
+			}
+		
+
+			color++;
+		}
 	}
 }
 

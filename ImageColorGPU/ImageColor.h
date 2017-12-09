@@ -12,7 +12,7 @@
 #endif
 
 
-#define COLOR_DEPTH 24
+#define COLOR_DEPTH 4
 #define MAX_DEGREES 360
 #define MIN_BRIGHTNESS 0.10f
 #define MAX_BRIGHTNESS 0.80f
@@ -53,6 +53,7 @@ Image* ReadBMP(char*);
 RgbColor AnalyzeColor(HsvColor*, int, int);
 int RoundToMultiple(int, int);
 __global__
-void AnalyzeColorGPU(HsvColor*, int, int);
+void AnalyzeColorGPU(HsvColor*, int, int, int*);
 __global__
 void ReductionMaxImage(HsvColor*, int, int);
+
