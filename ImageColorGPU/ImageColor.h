@@ -5,13 +5,6 @@
 #include <cuda_runtime.h>
 #include <cuda_runtime_api.h>
 
-#ifdef __CUDACC__
-#define cuda_SYNCTHREADS() __syncthreads()
-#else
-#define cuda_SYNCTHREADS()
-#endif
-
-
 #define COLOR_DEPTH 32
 #define MAX_DEGREES 360
 #define MIN_BRIGHTNESS 0.10

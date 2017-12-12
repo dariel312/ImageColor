@@ -58,8 +58,7 @@ void AnalyzeColorGPU(HsvColor* data, int Width, int Height, int* bucket)
 	for (int i = xId; i < Width * Height; i += stride)
 	{
 		HsvColor* color = (data + i);
-		//printf("COLOR: %.0f %.0f %.0f\n", color->H, color->S, color->V);
-		int colorIndex = (int)round(color->H * COLOR_DEPTH / MAX_DEGREES);
+		long long colorIndex = llrintf(color->H * COLOR_DEPTH / MAX_DEGREES);
 
 		if (colorIndex == COLOR_DEPTH)
 			colorIndex = 0;
