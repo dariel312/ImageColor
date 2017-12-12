@@ -102,7 +102,12 @@ copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
     <Image Include="Example-02.bmp" />
     <Image Include="Example-03.bmp" />
     <Image Include="Example-04.bmp" />
-    <Image Include="example.bmp" />
+    <Image Include="example-05.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="makefile">
+      <FileType>Makefile</FileType>
+    </Text>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

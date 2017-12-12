@@ -12,12 +12,10 @@
 #endif
 
 
-#define COLOR_DEPTH 4
+#define COLOR_DEPTH 32
 #define MAX_DEGREES 360
-#define MIN_BRIGHTNESS 0.10f
-#define MAX_BRIGHTNESS 0.80f
-#define MIN_SATURATION 0.3f
-#define BAD_PIXEL -1
+#define MIN_BRIGHTNESS 0.10
+#define MIN_SATURATION 0.30
 
 
 typedef struct RgbColor
@@ -47,13 +45,14 @@ public:
 	}
 };
 
+int RoundToMultiple(int, int);
+RgbColor HueInxToRGB(int);
 RgbColor HsvToRgb(HsvColor hsv);
 HsvColor RgbToHsv(RgbColor rgb);
 Image* ReadBMP(char*);
 RgbColor AnalyzeColor(HsvColor*, int, int);
-int RoundToMultiple(int, int);
 __global__
 void AnalyzeColorGPU(HsvColor*, int, int, int*);
 __global__
-void ReductionMaxImage(HsvColor*, int, int);
+void SumBucket(int*, int);
 

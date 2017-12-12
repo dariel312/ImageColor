@@ -16,23 +16,24 @@
     <Image Include="Example-03.bmp">
       <Filter>Images</Filter>
     </Image>
-    <Image Include="example.bmp">
-      <Filter>Images</Filter>
-    </Image>
-    <Image Include="example-01.bmp">
-      <Filter>Images</Filter>
-    </Image>
     <Image Include="Example-02.bmp">
       <Filter>Images</Filter>
     </Image>
     <Image Include="Example-04.bmp">
       <Filter>Images</Filter>
     </Image>
+    <Image Include="example-05.bmp">
+      <Filter>Images</Filter>
+    </Image>
+    <Image Include="example-01.bmp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Color.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImageColor.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="makefile" />
   </ItemGroup>
 </Project>
