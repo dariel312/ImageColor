@@ -2,7 +2,7 @@
 #include <time.h>
 
 #define THREAD_COUNT 512
-#define BLOCK_COUNT 2 
+#define BLOCK_COUNT 4
 
 Image* img = NULL;  //Image read from DISK
 HsvColor* imgGPU = NULL; //array of pixels on the gpu

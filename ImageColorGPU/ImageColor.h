@@ -4,9 +4,10 @@
 #include "device_launch_parameters.h"
 #include <cuda_runtime.h>
 #include <cuda_runtime_api.h>
+#include "math.h"
 
 #define COLOR_DEPTH 32
-#define MAX_DEGREES 360
+#define MAX_DEGREES 360.0
 #define MIN_BRIGHTNESS 0.10
 #define MIN_SATURATION 0.30
 

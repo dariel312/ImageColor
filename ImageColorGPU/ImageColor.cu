@@ -53,12 +53,12 @@ __global__
 void AnalyzeColorGPU(HsvColor* data, int Width, int Height, int* bucket)
 {
 	int xId = blockIdx.x * blockDim.x + threadIdx.x;
-	int stride = blockDim.x;
+	int stride = blockDim.x * gridDim.x;
 
 	for (int i = xId; i < Width * Height; i += stride)
 	{
 		HsvColor* color = (data + i);
-		long long colorIndex = llrintf(color->H * COLOR_DEPTH / MAX_DEGREES);
+		long long colorIndex = llrintf(color->H * __fdiv_rn(COLOR_DEPTH, MAX_DEGREES));
 
 		if (colorIndex == COLOR_DEPTH)
 			colorIndex = 0;
