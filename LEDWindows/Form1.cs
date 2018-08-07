@@ -28,25 +28,27 @@ namespace LEDController
             timer = new Timer();
             timer.Tick += updateGUI;
             timer.Start();
+            timer.Interval = 33;
 
             Task.Run(async () =>
             {
                 while (true)
                 {
                     update();
-                    Task.Delay(33);
+                    await Task.Delay(33);
                 }
             });
         }
+
         void updateGUI(object sender, EventArgs e)
         {
             label1.Text = "Memory: " + System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 / 1048576 + "mb";
             Bitmap img = new Bitmap(400, 400, PixelFormat.Format32bppArgb);
             Graphics g = Graphics.FromImage(img);
             g.DrawLine(new Pen(this.currectColor, 300), new Point(0, 0), new Point(300, 300));
-            pictureBox1.Image = scaled;
-
+            pictureBox1.Image = img;
         }
+
         void update()
         {
             screen = new Bitmap(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height, PixelFormat.Format32bppArgb);
@@ -59,6 +61,7 @@ namespace LEDController
 
 
             this.currectColor = ColorConverter.GetImageColor(scaled);
+
         }
 
 
