@@ -41,10 +41,10 @@ namespace LEDController
         void updateGUI(object sender, EventArgs e)
         {
             label1.Text = "Memory: " + System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 / 1048576 + "mb";
-            Bitmap img = new Bitmap(400, 400, PixelFormat.Format32bppArgb);
+            Bitmap img = new Bitmap(500, 500, PixelFormat.Format32bppArgb);
             Graphics g = Graphics.FromImage(img);
-            g.DrawLine(new Pen(this.currectColor, 300), new Point(0, 0), new Point(300, 300));
-            pictureBox1.Image = scaled;
+            g.DrawLine(new Pen(this.currectColor, 300), new Point(0, 0), new Point(500, 500));
+            pictureBox1.Image = img;
 
         }
         void update()

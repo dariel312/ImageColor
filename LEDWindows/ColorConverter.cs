@@ -34,7 +34,7 @@ namespace LEDController
 
                     colorIndex = colorIndex % colorDepth;
 
-                    if (brightness >= 0.10f && brightness <= 0.80f && saturation >= 0.3f)
+                    if (brightness >= 0.10f && brightness <= 0.95f && saturation >= 0.3f)
                         colors[colorIndex]++;
 
                 }
